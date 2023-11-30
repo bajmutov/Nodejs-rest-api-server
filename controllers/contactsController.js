@@ -1,14 +1,15 @@
-const contactOperations = require("../models/contacts");
 const createError = require("http-errors");
+const { Contact } = require("../models/contacts");
 
 const ctrlListContacts = async (_, res) => {
-  const contacts = await contactOperations.listContacts();
+  const contacts = await Contact.find({}, "-updatedAt -createdAt");
   res.json(contacts);
 };
 
 const ctrlGetById = async (req, res) => {
   const { contactId } = req.params;
-  const contactById = await contactOperations.getById(contactId);
+  const contactById = await Contact.findById(contactId);
+  console.log("first", contactById);
   if (!contactById) {
     throw createError(404, "Not found");
   }
@@ -16,15 +17,16 @@ const ctrlGetById = async (req, res) => {
 };
 
 const ctrlAddContact = async (req, res) => {
-  const newContact = await contactOperations.addContact(req.body);
+  const newContact = await Contact.create(req.body);
   res.status(201).json(newContact);
 };
 
 const ctrlUpdateContact = async (req, res) => {
   const { contactId } = req.params;
-  const updateContactById = await contactOperations.updateContact(
+  const updateContactById = await Contact.findByIdAndUpdate(
     contactId,
-    req.body
+    req.body,
+    { new: true }
   );
   if (!updateContactById) {
     throw createError(404, "Not found");
@@ -32,9 +34,20 @@ const ctrlUpdateContact = async (req, res) => {
   res.json(updateContactById);
 };
 
+const ctrlUpdateStatusContact = async (req, res) => {
+  const { contactId } = req.params;
+  const updateFavorite = await Contact.findByIdAndUpdate(contactId, req.body, {
+    new: true,
+  });
+  if (!updateFavorite) {
+    throw createError(404, "Not found");
+  }
+  res.json(updateFavorite);
+};
+
 const ctrlRemoveContact = async (req, res) => {
   const { contactId } = req.params;
-  const deleteContactById = await contactOperations.removeContact(contactId);
+  const deleteContactById = await Contact.findByIdAndDelete(contactId);
   if (!deleteContactById) {
     throw createError(404, "Not found");
   }
@@ -47,4 +60,5 @@ module.exports = {
   ctrlAddContact,
   ctrlUpdateContact,
   ctrlRemoveContact,
+  ctrlUpdateStatusContact,
 };
