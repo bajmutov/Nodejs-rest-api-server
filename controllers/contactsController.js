@@ -1,9 +1,15 @@
 const createError = require("http-errors");
 const { Contact } = require("../models/contacts");
 
-const ctrlListContacts = async (_, res) => {
-  const contacts = await Contact.find({}, "-updatedAt -createdAt");
-  res.json(contacts);
+const ctrlListContacts = async (req, res) => {
+  const { _id: owner } = req.user;
+  const { page = 1, limit = 20 } = req.query;
+  const skip = (page - 1) * limit;
+  const contacts = await Contact.find({ owner }, "-createdAt -updatedAt", {
+    skip,
+    limit,
+  }).populate("owner", "email subscription ");
+  res.json({ page, per_page: limit, total: contacts.length, contacts });
 };
 
 const ctrlGetById = async (req, res) => {
@@ -17,7 +23,8 @@ const ctrlGetById = async (req, res) => {
 };
 
 const ctrlAddContact = async (req, res) => {
-  const newContact = await Contact.create(req.body);
+  const { _id } = req.user;
+  const newContact = await Contact.create({ ...req.body, owner: _id });
   res.status(201).json(newContact);
 };
 

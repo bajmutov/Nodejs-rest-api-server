@@ -12,15 +12,22 @@ const {
   ctrlRemoveContact,
   ctrlUpdateStatusContact,
 } = require("../../controllers/contactsController");
+const authenticate = require("../../middleWarres/authenticate");
 
-router.get("/", ctrlWrapper(ctrlListContacts));
+router.get("/", authenticate, ctrlWrapper(ctrlListContacts));
 
-router.get("/:contactId", isValidId, ctrlWrapper(ctrlGetById));
+router.get("/:contactId", authenticate, isValidId, ctrlWrapper(ctrlGetById));
 
-router.post("/", validation(schemas.addSchema), ctrlWrapper(ctrlAddContact));
+router.post(
+  "/",
+  authenticate,
+  validation(schemas.addSchema),
+  ctrlWrapper(ctrlAddContact)
+);
 
 router.put(
   "/:contactId",
+  authenticate,
   isValidId,
   validation(schemas.addSchema),
   ctrlWrapper(ctrlUpdateContact)
@@ -28,11 +35,17 @@ router.put(
 
 router.patch(
   "/:contactId/favorite",
+  authenticate,
   isValidId,
   validation(schemas.updateFavouriteSchema),
   ctrlWrapper(ctrlUpdateStatusContact)
 );
 
-router.delete("/:contactId", isValidId, ctrlWrapper(ctrlRemoveContact));
+router.delete(
+  "/:contactId",
+  authenticate,
+  isValidId,
+  ctrlWrapper(ctrlRemoveContact)
+);
 
 module.exports = router;
