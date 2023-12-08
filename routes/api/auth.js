@@ -1,9 +1,4 @@
 const express = require("express");
-
-// const ctrl = require("../../controllers/authController");
-
-// const { validateBody, authenticate } = require("../../middlewares");
-
 const { schemas } = require("../../models/users");
 const validation = require("../../middleWarres/validation");
 const ctrlWrapper = require("../../helpers/ctrlWrapper");
@@ -12,6 +7,7 @@ const {
   login,
   getCurrent,
   logout,
+  updateSubscription,
 } = require("../../controllers/authController");
 const authenticate = require("../../middleWarres/authenticate");
 
@@ -28,5 +24,12 @@ router.post("/login", validation(schemas.loginSchema), ctrlWrapper(login));
 router.get("/current", authenticate, ctrlWrapper(getCurrent));
 
 router.post("/logout", authenticate, ctrlWrapper(logout));
+
+router.patch(
+  "/",
+  authenticate,
+  validation(schemas.updateSubscriptionSchema),
+  ctrlWrapper(updateSubscription)
+);
 
 module.exports = router;
