@@ -3,8 +3,24 @@ const { Contact } = require("../models/contacts");
 
 const ctrlListContacts = async (req, res) => {
   const { _id: owner } = req.user;
-  const { page = 1, limit = 20 } = req.query;
+  const { page = 1, limit = 20, favorite = false } = req.query;
   const skip = (page - 1) * limit;
+
+  if (favorite) {
+    const contacts = await Contact.find({ owner }, "-createdAt -updatedAt", {
+      skip,
+      limit,
+    }).populate("owner", "email subscription ");
+    const filterContacts = contacts.filter((contact) => contact.favorite);
+    res.json({
+      page,
+      per_page: limit,
+      total: contacts.length,
+      filterContacts,
+    });
+    return;
+  }
+
   const contacts = await Contact.find({ owner }, "-createdAt -updatedAt", {
     skip,
     limit,
@@ -15,7 +31,6 @@ const ctrlListContacts = async (req, res) => {
 const ctrlGetById = async (req, res) => {
   const { contactId } = req.params;
   const contactById = await Contact.findById(contactId);
-  console.log("first", contactById);
   if (!contactById) {
     throw createError(404, "Not found");
   }
