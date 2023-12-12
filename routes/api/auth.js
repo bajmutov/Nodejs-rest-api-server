@@ -8,8 +8,10 @@ const {
   getCurrent,
   logout,
   updateSubscription,
+  updateAvatar,
 } = require("../../controllers/authController");
 const authenticate = require("../../middleWarres/authenticate");
+const upload = require("../../middleWarres/upload");
 
 const router = express.Router();
 
@@ -30,6 +32,13 @@ router.patch(
   authenticate,
   validation(schemas.updateSubscriptionSchema),
   ctrlWrapper(updateSubscription)
+);
+
+router.patch(
+  "/avatars",
+  authenticate,
+  upload.single("avatar"),
+  ctrlWrapper(updateAvatar)
 );
 
 module.exports = router;
