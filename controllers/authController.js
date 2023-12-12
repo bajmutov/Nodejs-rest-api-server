@@ -5,7 +5,7 @@ const path = require("path");
 const fs = require("fs/promises");
 const HttpError = require("../helpers/HttpError");
 const { User } = require("../models/users");
-const Jimp = require("jimp");
+const avatarResize = require("../helpers/avatarResize");
 
 const { SECRET_KEY } = process.env;
 
@@ -83,15 +83,7 @@ const updateAvatar = async (req, res) => {
   const filename = `${_id}_${originalname}`;
   try {
     const resultUpload = path.join(avatarsDir, filename);
-    const img = await Jimp.read(tempUpload);
-    img
-      .autocrop()
-      .cover(
-        250,
-        250,
-        Jimp.HORIZONTAL_ALIGN_CENTER | Jimp.VERTICAL_ALIGN_MIDDLE
-      )
-      .writeAsync(tempUpload);
+    avatarResize(tempUpload);
     await fs.rename(tempUpload, resultUpload);
     const avatarURL = path.join("avatars", filename);
     await User.findByIdAndUpdate(_id, { avatarURL });
