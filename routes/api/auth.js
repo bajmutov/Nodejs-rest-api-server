@@ -9,6 +9,8 @@ const {
   logout,
   updateSubscription,
   updateAvatar,
+  verifyEmail,
+  resendVerifyEmail,
 } = require("../../controllers/authController");
 const authenticate = require("../../middleWarres/authenticate");
 const upload = require("../../middleWarres/upload");
@@ -19,6 +21,14 @@ router.post(
   "/register",
   validation(schemas.registerSchema),
   ctrlWrapper(register)
+);
+
+router.get("/verify/:verificationToken", ctrlWrapper(verifyEmail));
+
+router.post(
+  "/verify",
+  validation(schemas.emailSchema),
+  ctrlWrapper(resendVerifyEmail)
 );
 
 router.post("/login", validation(schemas.loginSchema), ctrlWrapper(login));
