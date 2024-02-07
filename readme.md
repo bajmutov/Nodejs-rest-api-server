@@ -1,4 +1,4 @@
-## GNode.js Course 
+## Node.js Course 
 
 # Команди:
 
